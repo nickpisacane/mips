@@ -125,10 +125,22 @@ export class Root {
 }
 
 // Psuedo-instructions will get replaced by these
-export class TranformedNode extends Node {
+export class TransformedNode extends Node {
   constructor(operations: OperationNode[]) {
     super('TRANSFORMED')
 
     this.children = operations
   }
+}
+
+export const utils = {
+  isOperationNode: (n: Node): n is OperationNode => n.type === 'OPERATION',
+  isLabelNode: (n: Node): n is LabelNode => n.type === 'LABEL',
+  isDirectiveNode: (n: Node): n is DirectiveNode => n.type === 'DIRECTIVE',
+  isDataNode: (n: Node): n is DataNode => n.type === 'DATA',
+  isRegisterNode: (n: Node): n is RegisterNode => n.type === 'REGISTER',
+  isImmediateNode: (n: Node): n is ImmediateNode => n.type === 'IMMEDIATE',
+  isOffsetNode: (n: Node): n is OffsetNode => n.type === 'OFFSET',
+  isAddressNode: (n: Node): n is AddressNode => n.type === 'ADDRESS',
+  isTranformedNode: (n: Node): n is TransformedNode => n.type === 'TRANSFORMED',
 }
