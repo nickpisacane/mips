@@ -1,0 +1,19 @@
+{
+  "name": "mips",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "ts-mocha test/**/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.33",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "ts-mocha": "^1.0.3",
+    "typescript": "^2.5.3",
+    "watch-run": "^1.2.5"
+  }
+}
