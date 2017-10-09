@@ -9,7 +9,7 @@ describe('Parser', () => {
     bge $t1, $t2, end
     `
     const expectedChildren = [
-      new AST.TranformedNode([
+      new AST.TransformedNode([
         new AST.OperationNode('slt', [
           new AST.RegisterNode('$at'),
           new AST.RegisterNode('$t1'),
