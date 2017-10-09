@@ -32,7 +32,7 @@ const transformers: {
   // bge $rx, $ry, addr =>
   //    slt $at, $rx, $ry
   //    beq $at, $0, addr
-  'bge': (op: AST.OperationNode) => new AST.TranformedNode([
+  'bge': (op: AST.OperationNode) => new AST.TransformedNode([
     // slt $at, $rx, $ry
     new AST.OperationNode('slt', [ $AT, op.args[0], op.args[1] ]),
     // beq $at, $0, addr
@@ -42,7 +42,7 @@ const transformers: {
   // bgt $rx, $ry, addr =>
   //    slt $at, $ry, $rx
   //    bne $at, $0, addr
-  'bgt': (op: AST.OperationNode) => new AST.TranformedNode([
+  'bgt': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[1], op.args[0] ]),
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
   ]),
@@ -50,7 +50,7 @@ const transformers: {
   // ble $rx, $ry, addr =>
   //    slt $at, $ry, $rx
   //    beq $at, $0, addr
-  'ble': (op: AST.OperationNode) => new AST.TranformedNode([
+  'ble': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[1], op.args[0] ]),
     new AST.OperationNode('beq', [ $AT, $0, op.args[2] ]),
   ]),
@@ -58,7 +58,7 @@ const transformers: {
   // blt $rx, $ry, addr =>
   //    slt $at, $rx, $ry
   //    bne $at, $0, addr
-  'blt': (op: AST.OperationNode) => new AST.TranformedNode([
+  'blt': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[0], op.args[1] ]),
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
   ]),
@@ -66,20 +66,20 @@ const transformers: {
   // la $rx, addr =>
   //    lui $at, addr
   //    ori $rx, $at, 0
-  'la': (op: AST.OperationNode) => new AST.TranformedNode([
+  'la': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('lui', [ $AT, op.args[1] ]),
     new AST.OperationNode('ori', [ op.args[0], $AT, new AST.ImmediateNode('0') ]),
   ]),
 
   // li $rx, imm =>
   //    addiu $rx, $0, imm
-  'li': (op: AST.OperationNode) => new AST.TranformedNode([
+  'li': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('addiu', [ op.args[0], $0, op.args[1] ]),
   ]),
 
   // move $rx, $ry =>
   //    addu $rx, $0, $ry
-  'move': (op: AST.OperationNode) => new AST.TranformedNode([
+  'move': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('addu', [ op.args[0], $0, op.args[1] ]),
   ]),
 }
