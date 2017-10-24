@@ -29,4 +29,60 @@ describe('Parser', () => {
 
     expect(ast.text.children).to.deep.equal(expectedChildren)
   })
+
+  it('transforms immediate instructions', () => {
+    const source = `
+    addi $t1, $t2, 0xfffffffff
+    `
+
+    const tokens = new Lexer(source).lex()
+    const ast = new Parser(tokens).parse()
+
+    expect(ast.text.children).to.deep.equal([
+      new AST.TransformedNode([
+        new AST.OperationNode('lui', [
+          new AST.RegisterNode('$at'),
+          new AST.ImmediateNode((0xffff).toString()),
+        ]),
+        new AST.OperationNode('ori', [
+          new AST.RegisterNode('$at'),
+          new AST.RegisterNode('$at'),
+          new AST.ImmediateNode((0xffff).toString()),
+        ]),
+        new AST.OperationNode('add', [
+          new AST.RegisterNode('$t1'),
+          new AST.RegisterNode('$t2'),
+          new AST.RegisterNode('$at'),
+        ]),
+      ]),
+    ])
+  })
+
+  it('transforms negative immediate instructions', () => {
+    const source = `
+    andi $t1, $t2, -1
+    `
+
+    const tokens = new Lexer(source).lex()
+    const ast = new Parser(tokens).parse()
+
+    expect(ast.text.children).to.deep.equal([
+      new AST.TransformedNode([
+        new AST.OperationNode('lui', [
+          new AST.RegisterNode('$at'),
+          new AST.ImmediateNode((0xffff).toString()),
+        ]),
+        new AST.OperationNode('ori', [
+          new AST.RegisterNode('$at'),
+          new AST.RegisterNode('$at'),
+          new AST.ImmediateNode((0xffff).toString()),
+        ]),
+        new AST.OperationNode('and', [
+          new AST.RegisterNode('$t1'),
+          new AST.RegisterNode('$t2'),
+          new AST.RegisterNode('$at'),
+        ]),
+      ]),
+    ])
+  })
 })
