@@ -18,6 +18,9 @@ const dataLevelDirectives: string[] = [
   '.double',
 ]
 
+// Matches (leading - sign, or not) for hex, octal, binary, and decimal
+const IMM_RE = /^(-?)(0x[0-9A-Fa-f]+|0o[0-7]+|0b[0-1]+|[0-9]+)$/
+
 // TODO: Make errors usefull, i.e. wrap in a class that includes lineno, colno
 export default class Parser {
   private tokens: Token[]
@@ -106,7 +109,7 @@ export default class Parser {
         // Register
         // TODO: Validate group
         ret = new AST.RegisterNode(g[0].value)
-      } else if (/^(-?)[0-9]+$/.test(g[0].value)) {
+      } else if (IMM_RE.test(g[0].value)) {
         // Immediate OR Offset
         if (g.length === 1) {
           // Immediate
