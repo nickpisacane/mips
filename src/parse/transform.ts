@@ -1,30 +1,24 @@
 import * as AST from './AST'
 
-type PsuedoInstructionType =
-  'bge'  |
-  'bgt'  |
-  'ble'  |
-  'blt'  |
-  'la'   |
-  'li'   |
-  'move' |
-  'nop'
-
-const psuedoOperationNames: string[] = [
-  'bge',
-  'bgt',
-  'ble',
-  'blt',
-  'la',
-  'li',
-  'move',
-  'nop',
-]
-
-type TransformerFunc = (node: AST.OperationNode) => AST.TranformedNode
+type TransformerFunc = (node: AST.OperationNode) => AST.TransformedNode | AST.OperationNode
 
 const $AT = new AST.RegisterNode('$at')
 const $0 = new AST.RegisterNode('$0')
+
+const transformImmediate = (op: AST.OperationNode, rOp: string): AST.TransformedNode | AST.OperationNode => {
+  const immNode = op.args[2] as AST.ImmediateNode
+  const split = immNode.split()
+  // Immediate fits in 16 bits, bail
+  if (split.length === 1) return op
+
+  // Pack the immediate value into the $at register, then invoke the associated R-type operation
+  // with $at in replacement of immediate
+  return new AST.TransformedNode([
+    new AST.OperationNode('lui', [ $AT, split[0] ]),
+    new AST.OperationNode('ori', [ $AT, $AT, split[1] ]),
+    new AST.OperationNode(rOp, [ op.args[0], op.args[1], $AT ]),
+  ])
+}
 
 const transformers: {
   [key: string]: TransformerFunc
@@ -33,9 +27,7 @@ const transformers: {
   //    slt $at, $rx, $ry
   //    beq $at, $0, addr
   'bge': (op: AST.OperationNode) => new AST.TransformedNode([
-    // slt $at, $rx, $ry
     new AST.OperationNode('slt', [ $AT, op.args[0], op.args[1] ]),
-    // beq $at, $0, addr
     new AST.OperationNode('beq', [ $AT, $0, op.args[2] ]),
   ]),
 
@@ -71,17 +63,74 @@ const transformers: {
     new AST.OperationNode('ori', [ op.args[0], $AT, new AST.ImmediateNode('0') ]),
   ]),
 
-  // li $rx, imm =>
-  //    addiu $rx, $0, imm
-  'li': (op: AST.OperationNode) => new AST.TransformedNode([
-    new AST.OperationNode('addiu', [ op.args[0], $0, op.args[1] ]),
-  ]),
-
   // move $rx, $ry =>
   //    addu $rx, $0, $ry
   'move': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('addu', [ op.args[0], $0, op.args[1] ]),
   ]),
+
+  // li $rx, imm =>
+  //    addiu $rx, $0, imm
+  // OR
+  // li $rx, imm =>
+  //    lui $at, upper(imm)
+  //    ori $rx, $at, lower(imm)
+  'li': (op: AST.OperationNode) => {
+    const immNode = op.args[1] as AST.ImmediateNode
+    const split = immNode.split()
+    if (split.length == 1) {
+      return new AST.TransformedNode([
+        new AST.OperationNode('addiu', [ op.args[0], $0, op.args[1] ]),
+      ])
+    }
+    return new AST.TransformedNode([
+      new AST.OperationNode('lui', [ $AT, split[0] ]),
+      new AST.OperationNode('ori', [ op.args[0], $AT, split[1] ]),
+    ])
+  },
+
+  // addi $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    add $rt, $rs, $at
+  'addi': (op: AST.OperationNode) => transformImmediate(op, 'add'),
+
+  // addiu $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    addu $rt, $rs, $at
+  'addiu': (op: AST.OperationNode) => transformImmediate(op, 'addu'),
+
+  // andi $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    and $rt, $rs, $at
+  'andi': (op: AST.OperationNode) => transformImmediate(op, 'and'),
+
+  // ori $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    or $rt, $rs, $at
+  'ori': (op: AST.OperationNode) => transformImmediate(op, 'or'),
+
+  // xori $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    xor $rt, $rs, $at
+  'xori': (op: AST.OperationNode) => transformImmediate(op, 'xor'),
+
+  // slti $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    slt $rt, $rs, $at
+  'slti': (op: AST.OperationNode) => transformImmediate(op, 'slt'),
+
+
+  // slti $rt, $rs, imm ?=>
+  //    lui $at, upper(imm)
+  //    ori $at, $at, lower(imm)
+  //    sltu $rt, $rs, $at
+  'sltiu': (op: AST.OperationNode) => transformImmediate(op, 'sltu'),
 }
 
 const isOperationNode = (n: AST.Node): n is AST.OperationNode => (
@@ -105,7 +154,7 @@ export default function transform(root: AST.Root) {
     }
 
     if (isOperationNode(node)) {
-      if (!!~psuedoOperationNames.indexOf(node.name)) {
+      if (node.name in transformers) {
         const transformer = transformers[node.name]
         parent.children[index] = transformer(node)
       }
