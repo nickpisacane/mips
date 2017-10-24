@@ -1,3 +1,5 @@
+import parseImmediate from '../utils/parseImmediate'
+
 export type NodeType =
   'DIRECTIVE' |
   'DATA'      |
@@ -71,6 +73,20 @@ export class ImmediateNode extends Node {
     super('IMMEDIATE')
 
     this.value = value
+  }
+
+  public split(): ImmediateNode[] {
+    const val = parseImmediate(this.value)
+    const upper = (val & 0xffff0000) >>> 16
+    const lower = (val & 0x0000ffff)
+    const ret: ImmediateNode[] = []
+
+    if (upper > 0) {
+      ret.push(new ImmediateNode(upper.toString()))
+    }
+    ret.push(new ImmediateNode(lower.toString()))
+
+    return ret
   }
 }
 
