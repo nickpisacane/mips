@@ -104,11 +104,19 @@ export class OffsetNode extends Node {
 
 export class AddressNode extends Node {
   public label: string
+  public partitioned: boolean
+  public part: 'upper' | 'lower'
 
   constructor(label: string) {
     super('ADDRESS')
 
     this.label = label
+    this.partitioned = false
+  }
+
+  public partition(part: 'upper' | 'lower') {
+    this.partitioned = true
+    this.part = part
   }
 }
 
