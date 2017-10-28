@@ -55,14 +55,17 @@ const transformers: {
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
   ]),
 
-  // TODO: refactor
   // la $rx, addr =>
-  //    lui $at, addr
-  //    ori $rx, $at, 0
-  'la': (op: AST.OperationNode) => new AST.TransformedNode([
-    new AST.OperationNode('lui', [ $AT, op.args[1] ]),
-    new AST.OperationNode('ori', [ op.args[0], $AT, new AST.ImmediateNode('0') ]),
-  ]),
+  //    lui $at, upper(addr)
+  //    ori $rx, $at, lower(addr)
+  'la': (op: AST.OperationNode) => {
+    const addr = op.args[1] as AST.AddressNode
+
+    return new AST.TransformedNode([
+      new AST.OperationNode('lui', [ $AT, addr.partition('upper') ]),
+      new AST.OperationNode('ori', [ op.args[0], $AT, addr.partition('lower') ]),
+    ])
+  },
 
   // move $rx, $ry =>
   //    addu $rx, $0, $ry
