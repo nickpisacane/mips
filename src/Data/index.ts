@@ -1,4 +1,5 @@
 import * as AST from '../parse/AST'
+import parseImmediate from '../utils/parseImmediate'
 
 export type DataType =
   'byte'   |
@@ -12,7 +13,6 @@ export const directives: string[] = [
   '.word',
   '.asciiz',
   '.ascii',
-  '.word',
   '.byte',
   '.space',
   '.float',
@@ -29,6 +29,25 @@ export function fromAST(node: AST.DataNode): Data {
   const directive = node.dataDirective
   if (!~directives.indexOf(directive)) {
     throw new Error(`Unknown data directive: ${directive}`)
+  }
+
+  switch (directive) {
+    case '.ascii':
+    case '.asciiz':
+      const str = node.values[0].replace(/^"|"$/g, '')
+      return directive === '.ascii' ? new ASCII(str) : new ASCIIZ(str)
+    case '.word':
+      return new Word(node.values.map(parseImmediate))
+    case '.byte':
+      return new Byte(node.values.map(value => {
+        if (/^'/.test(value)) {
+          return value.charCodeAt(1)
+        }
+        return parseImmediate(value)
+      }))
+    case '.space':
+      return new Byte(new Array(parseImmediate(node.values[0])).fill(0))
+
   }
 
   // TODO: Implement
@@ -74,9 +93,9 @@ export class Word implements Data {
     const arr = new Uint8Array(this.size())
 
     for (let i = 0; i < this.values.length; i++) {
-      arr[i + 0] = (this.values[i] & 0xff000000) >> 24
-      arr[i + 1] = (this.values[i] & 0x00ff0000) >> 16
-      arr[i + 2] = (this.values[i] & 0x0000ff00) >> 8
+      arr[i + 0] = (this.values[i] & 0xff000000) >>> 24
+      arr[i + 1] = (this.values[i] & 0x00ff0000) >>> 16
+      arr[i + 2] = (this.values[i] & 0x0000ff00) >>> 8
       arr[i + 3] = (this.values[i] & 0x000000ff)
     }
 
