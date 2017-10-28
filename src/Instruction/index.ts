@@ -30,25 +30,25 @@ const ADDR_SHIFT = OP_SHIFT - 26
 
 export const utils = {
   fromInt(instr: number): Instruction {
-    const op = (instr & OP_MASK) >> OP_SHIFT
+    const op = (instr & OP_MASK) >>> OP_SHIFT
     if (op === 0) {
       // R type
-      const rs = (instr & RS_MASK) >> RS_SHIFT
-      const rt = (instr & RT_MASK) >> RT_SHIFT
-      const rd = (instr & RD_MASK) >> RD_SHIFT
-      const sh = (instr & SH_MASK) >> SH_SHIFT
-      const func = (instr & FUNC_MASK) >> FUNC_SHIFT
+      const rs = (instr & RS_MASK) >>> RS_SHIFT
+      const rt = (instr & RT_MASK) >>> RT_SHIFT
+      const rd = (instr & RD_MASK) >>> RD_SHIFT
+      const sh = (instr & SH_MASK) >>> SH_SHIFT
+      const func = (instr & FUNC_MASK) >>> FUNC_SHIFT
       return new RInstruction(op, rs, rt, rd, sh, func)
     }
     if (op <= 3) {
       // J type
-      const addr = (instr & ADDR_MASK) >> ADDR_SHIFT
+      const addr = (instr & ADDR_MASK) >>> ADDR_SHIFT
       return new JInstruction(op, addr)
     }
 
-    const rs = (instr & RS_MASK) >> RS_SHIFT
-    const rt = (instr & RT_MASK) >> RT_SHIFT
-    const imm = (instr & IMM_MASK) >> IMM_SHIFT
+    const rs = (instr & RS_MASK) >>> RS_SHIFT
+    const rt = (instr & RT_MASK) >>> RT_SHIFT
+    const imm = (instr & IMM_MASK) >>> IMM_SHIFT
 
     return new IInstruction(op, rs, rt, imm)
   },
@@ -85,7 +85,8 @@ export class RInstruction implements Instruction {
   }
 
   public toInt(): number {
-    return 0
+    const { op, rs, rt, rd, sh, func } = this
+    return (op << OP_SHIFT) + (rs << RS_SHIFT) + (rt << RT_SHIFT) + (rd << RD_SHIFT) + (sh << SH_SHIFT) + func
   }
 }
 
@@ -104,7 +105,8 @@ export class IInstruction implements Instruction {
   }
 
   public toInt(): number {
-    return 0
+    const { op, rs, rt, imm } = this
+    return (op << OP_SHIFT) + (rs << RS_SHIFT) + (rt << RT_SHIFT) + imm
   }
 }
 
@@ -119,6 +121,7 @@ export class JInstruction implements Instruction {
   }
 
   public toInt(): number {
-    return 0
+    const { j, addr } = this
+    return (j << OP_SHIFT) + addr
   }
 }
