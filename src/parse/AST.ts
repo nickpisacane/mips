@@ -114,9 +114,12 @@ export class AddressNode extends Node {
     this.partitioned = false
   }
 
-  public partition(part: 'upper' | 'lower') {
-    this.partitioned = true
-    this.part = part
+  public partition(part: 'upper' | 'lower'): AddressNode {
+    const addr = new AddressNode(this.label)
+    addr.partitioned = true
+    addr.part = part
+
+    return addr
   }
 }
 
