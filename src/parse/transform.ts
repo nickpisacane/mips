@@ -55,6 +55,7 @@ const transformers: {
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
   ]),
 
+  // TODO: refactor
   // la $rx, addr =>
   //    lui $at, addr
   //    ori $rx, $at, 0
