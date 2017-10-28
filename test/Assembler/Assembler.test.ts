@@ -14,7 +14,7 @@ describe('Assembler', () => {
         li $t0, 20
         li $t1, 22
         add $t2, $t0, $t1
-    check:
+      check:
         li $t3, 42
         beq $t2, $t3, exit
 
@@ -37,8 +37,16 @@ describe('Assembler', () => {
     expect(assembled.data[6]).to.equal('o'.charCodeAt(0))
     expect(assembled.data[7]).to.equal(0)
 
+    console.log(assembled.symbols)
+    console.log(assembled.relocations)
+
     // reloctions
-    expect(assembled.relocations['check']).to.equal(0x0040000c)
-    expect(Object.keys(assembled.relocations)).to.deep.equal(['check'])
+    expect(assembled.relocations[0x00400014]).to.equal('check')
+    expect(Object.keys(assembled.relocations)).to.deep.equal([(0x00400014).toString()])
+
+    // symbols
+    expect(['foo', 'bar', 'main', 'check', 'exit'].sort()).to.deep.equal(
+      Object.keys(assembled.symbols).sort()
+    )
   })
 })

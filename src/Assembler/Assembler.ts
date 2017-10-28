@@ -17,6 +17,14 @@ import AssembledObject from './AssmebledObject'
 const BASE_TEXT_ADDR = 0x00400000
 const BASE_DATA_ADDR = 0x10010000
 
+const invertIndexTable = (t: { [key: string]: number }): { [key: number]: string } => {
+  const ret: { [key: number]: string } = {}
+  Object.keys(t).forEach(k => {
+    ret[t[k]] = k
+  })
+  return ret
+}
+
 export default class Assembler {
   private astRoot: AST.Root
   private astInstructions: AST.OperationNode[]
@@ -24,7 +32,7 @@ export default class Assembler {
   private instructionLabels: { [key: string]: number } = {}
   private dataLabels: { [key: string]: number } = {}
   private symbols: { [key: string]: number } = {}
-  private relocations: { [key: string]: number } = {}
+  private relocations: { [key: number]: string } = {}
   private instructions: Uint32Array
   private data: Uint8Array
 
@@ -95,6 +103,41 @@ export default class Assembler {
     return -1
   }
 
+  private genSymbolTable() {
+    const invertedInstructionLabels = invertIndexTable(this.instructionLabels)
+    this.symbols = {}
+
+    this.astInstructions.forEach((op, i) => {
+      if (i in invertedInstructionLabels) {
+        const addr = BASE_TEXT_ADDR + i * 4
+        this.symbols[invertedInstructionLabels[i]] = addr
+      }
+    })
+
+    Object.keys(this.dataLabels).forEach(label => {
+      this.symbols[label] = BASE_DATA_ADDR + this.dataLabels[label]
+    })
+  }
+
+  private genRelocationTable() {
+    this.relocations = {}
+    this.astInstructions.forEach((op, i) => {
+      const index = this.indexOfLabel(op)
+      if ((op.name === 'j' || op.name == 'jal') && ~index) {
+        const addrNode = op.args[index] as AST.AddressNode
+        console.log(addrNode.label, this.symbols[addrNode.label])
+        if ((addrNode.label in this.symbols)) {
+          const addr = BASE_TEXT_ADDR + i * 4
+          this.relocations[addr] = addrNode.label
+        } else {
+          // TODO: better error
+          throw new Error(`Invalid Jump`)
+        }
+      }
+    })
+  }
+
+  // TODO: clean up
   private interpolateLabels() {
     this.astInstructions.forEach((node, i) => {
       const index = this.indexOfLabel(node)
@@ -104,13 +147,8 @@ export default class Assembler {
         let labelIndex: number
         let immediateValue: number = 0
 
-
-
         if (label in this.instructionLabels) {
           labelIndex = this.instructionLabels[label]
-
-          // symbol table
-          this.symbols[label] = BASE_TEXT_ADDR + labelIndex * 4
           if (node.name === 'beq' || node.name === 'bne') {
             // Interpolate offset
             immediateValue = labelIndex - i - 1
@@ -120,21 +158,12 @@ export default class Assembler {
           }
         } else if (label in this.dataLabels) {
           labelIndex = this.dataLabels[label]
-          // symbol table
-          this.symbols[label] = immediateValue = BASE_DATA_ADDR + labelIndex
         } else {
           throw new Error(`Bad Label: ${label}`)
         }
 
         console.log(`(${node.name}): ${addrNode.label} => ${immediateValue}`)
         node.args[index] = new AST.ImmediateNode(immediateValue.toString())
-
-        // relocation table
-        if (AST.utils.isOperationNode(node)) {
-          if (node.name === 'j' || node.name === 'jal') {
-            this.relocations[label] = immediateValue
-          }
-        }
       }
     })
   }
@@ -238,6 +267,8 @@ export default class Assembler {
     const ret = new AssembledObject()
     this.genData()
     this.genASTInstructions()
+    this.genSymbolTable()
+    this.genRelocationTable()
     this.interpolateLabels()
     this.genObjInstructions()
     this.genInstructions()
