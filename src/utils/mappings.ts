@@ -33,6 +33,9 @@ export const registers: {
   '$sp': 29,
   '$fp': 30,
   '$ra': 31,
+  'pc': 32,
+  'hi': 33,
+  'lo': 34,
 }
 
 export const instructions: {
