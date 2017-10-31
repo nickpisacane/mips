@@ -20,9 +20,9 @@ export interface RegistersEmitter {
 
 export default class Registers extends EventEmitter implements RegistersEmitter {
   public size: number
-  private nameToIndex: { [key: string]: number }
-  private indexToName: { [key: number]: string }
-  private registers: Uint32Array
+  protected nameToIndex: { [key: string]: number }
+  protected indexToName: { [key: number]: string }
+  protected registers: Uint32Array
 
   constructor(options: RegisterOptions) {
     super()
