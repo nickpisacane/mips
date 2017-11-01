@@ -55,11 +55,11 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       initial: this.assembledObj.data,
     })
     this.heapMemory = new Memory({
-      size: 100, // TODO: Initial heap size?
+      size: 1024,
       baseAddress: constants.BASE_STACK_POINTER + 1,
     })
     this.stack = new Stack({
-      size: 1024, // TODO: Initial stack size?
+      size: 1024,
       lastAddress: constants.BASE_STACK_POINTER,
     })
   }
