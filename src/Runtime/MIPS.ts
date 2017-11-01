@@ -99,13 +99,33 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     return this.heapMemory
   }
 
-  private readMemory(address: number): number {
+  private readByte(address: number): number {
     const mem = this.resolveMemory(address)
     return mem.get(address)
   }
 
-  private setMemory(address: number, value: number) {
+  private writeByte(address: number, value: number) {
     const mem = this.resolveMemory(address)
     mem.set(address, value)
+  }
+
+  private readWord(address: number): number {
+    const mem = this.resolveMemory(address)
+    let ret = 0
+
+    ret += mem.get(address + 0) << 24
+    ret += mem.get(address + 1) << 16
+    ret += mem.get(address + 2) << 8
+    ret += mem.get(address + 3)
+
+    return ret | 0
+  }
+
+  private writeWord(address: number, value: number) {
+    const mem = this.resolveMemory(address)
+    mem.set(address + 0, (value & 0xff000000) >>> 24)
+    mem.set(address + 1, (value & 0x00ff0000) >>> 16)
+    mem.set(address + 2, (value & 0x0000ff00) >>> 8)
+    mem.set(address + 3, (value & 0x000000ff))
   }
 }
