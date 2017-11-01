@@ -7,8 +7,11 @@ import AssembledObject from '../assemble/AssmebledObject'
 import * as mappings from '../utils/mappings'
 import Instruction from '../Instruction'
 
-import PrimaryRegisters from './PrimaryRegisters'
 import * as constants from './constants'
+import PrimaryRegisters from './PrimaryRegisters'
+import Memory from './Memory'
+import Stack from './Stack'
+import IO from './IO'
 
 export interface MIPSOptions {
   stdin: Readable
@@ -22,45 +25,55 @@ export interface MIPSEmitter {
 }
 
 export default class MIPS extends EventEmitter implements MIPSEmitter {
-  private stdin: Readable
-  private stdout: Writable
-  private stderr: Writable
   private source: string
-  private compiled: boolean
+
+  private io: IO
 
   private assembledObj: AssembledObject
   private primaryRegisters: PrimaryRegisters
 
+  private dataMemory: Memory
+  private heapMemory: Memory
+  private stack: Stack
+
   constructor(options: MIPSOptions) {
     super()
 
-    this.stdin = options.stdin
-    this.stdout = options.stdout
-    this.stderr = options.stderr
     this.source = options.source
 
+    this.io = new IO({
+      stdin: options.stdin,
+      stdout: options.stdout,
+      stderr: options.stderr,
+    })
+
     this.primaryRegisters = new PrimaryRegisters()
-    this.compiled = false
-  }
-
-  private compile() {
     this.assembledObj = assemble(parse(this.source))
-    this.compiled = true
+    this.dataMemory = new Memory({
+      size: this.assembledObj.data.length,
+      fixed: true,
+      initial: this.assembledObj.data,
+    })
+    this.heapMemory = new Memory({
+      size: 100, // TODO: Initial heap size?
+      baseAddress: constants.BASE_STACK_POINTER + 1,
+    })
+    this.stack = new Stack({
+      size: 1024, // TODO: Initial stack size?
+      lastAddress: constants.BASE_STACK_POINTER,
+    })
   }
 
-  public start() {
-    this.compile()
-  }
-
-  public executeNextInstruction() {
+  public executeNextInstruction(): boolean {
     const index = this.resolveInstructionIndex()
     if (index >= this.assembledObj.objInstructions.length) {
-      throw new Error(`Out of range`)
+      return false
     }
     const instr = this.assembledObj.objInstructions[index]
     this.executeInstruction(instr)
 
     this.primaryRegisters.set('pc', this.primaryRegisters.get('pc') + 4)
+    return true
   }
 
   private executeInstruction(instr: Instruction) {
@@ -70,5 +83,29 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
   private resolveInstructionIndex(): number {
     const pc = this.primaryRegisters.get('pc')
     return (pc - constants.BASE_TEXT_ADDR) / 4
+  }
+
+  private resolveMemory(address: number): Memory {
+    const begOfData = constants.BASE_DATA_ADDR
+    const endOfData = constants.BASE_DATA_ADDR + this.dataMemory.getSize()
+    const endOfStack = constants.BASE_STACK_POINTER
+
+    if (address >= begOfData && address < endOfData) {
+      return this.dataMemory
+    }
+    if (address <= endOfStack) {
+      return this.stack
+    }
+    return this.heapMemory
+  }
+
+  private readMemory(address: number): number {
+    const mem = this.resolveMemory(address)
+    return mem.get(address)
+  }
+
+  private setMemory(address: number, value: number) {
+    const mem = this.resolveMemory(address)
+    mem.set(address, value)
   }
 }
