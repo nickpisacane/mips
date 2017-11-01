@@ -76,6 +76,16 @@ export default class IO {
     return this.readUntilMatch(/^\s/)
   }
 
+  public async readInt(): Promise<number> {
+    const str = await this.read()
+    return parseInt(str, 10)
+  }
+
+  public async readFloat(): Promise<number> {
+    const str = await this.read()
+    return parseFloat(str)
+  }
+
   public write(data: string) {
     this.stdout.write(data)
   }
