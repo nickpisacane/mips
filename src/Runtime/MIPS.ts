@@ -40,12 +40,14 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   private io: IO
 
-  private assembledObj: AssembledObject
-  private primaryRegisters: PrimaryRegisters
+  public assembledObj: AssembledObject
+  public primaryRegisters: PrimaryRegisters
 
   private dataMemory: Memory
   private heapMemory: Memory
   private stack: Stack
+
+  private exited: boolean
 
   constructor(options: MIPSOptions) {
     super()
@@ -74,10 +76,12 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       size: 1024,
       lastAddress: constants.BASE_STACK_POINTER,
     })
+
+    this.exited = false
   }
 
   public async execute(): Promise<void> {
-    while (true) {
+    while (!this.exited) {
       const ok = await this.executeNextInstruction()
       if (!ok) break
     }
@@ -194,11 +198,11 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           break
 
         case OP_CODES.jr:
-          r.set('pc', r.get(i.rs))
+          r.set('pc', r.get(i.rs) - 4)
           break
 
         case OP_CODES.jalr:
-          r.set('$ra', r.get('pc') + 8)
+          r.set('$ra', r.get('pc') + 4)
           r.set('pc', r.get(i.rs))
           break
 
@@ -241,13 +245,13 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
         case OP_CODES.beq:
           if (int32.signed(r.get(i.rs)) === int32.signed(r.get(i.rt))) {
-            r.set('pc', r.get('pc') + 4 + (i.imm << 2))
+            r.set('pc', r.get('pc') + (i.imm << 2))
           }
           break
 
         case OP_CODES.bne:
           if (int32.signed(r.get(i.rs)) !== int32.signed(r.get(i.rt))) {
-            r.set('pc', r.get('pc') + 4 + (i.imm << 2))
+            r.set('pc', r.get('pc') + (i.imm << 2))
           }
           break
 
@@ -301,12 +305,12 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     } else if (i instanceof JInstruction) {
       switch (i.j) {
         case OP_CODES.j:
-          r.set('pc', r.get('pc') & 0xf0000000 | (i.addr << 2))
+          r.set('pc', i.addr - 4)
           break
 
         case OP_CODES.jal:
-          r.set('ra', r.get('pc') + 8)
-          r.set('pc', r.get('pc') & 0xf0000000 | (i.addr << 2))
+          r.set('$ra', r.get('pc') + 4)
+          r.set('pc', i.addr - 4)
           break
       }
     }
@@ -420,7 +424,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
         // TODO: read float, double, string. alloc heap
         break
       case 10:
-        // TODO: Need to create an exit flag (instance wide) to handle this...
+        this.exited = true
         break
     }
   }
