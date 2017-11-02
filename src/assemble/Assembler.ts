@@ -175,7 +175,7 @@ export default class Assembler {
     this.objInstructions = this.astInstructions.map(node => {
       const info = instructions[node.name]
       // TODO: Better errors
-      if (!info) throw new Error('This should not happen')
+      if (!info) throw new Error(`Assmebler: Unknown instruction "${node.name}"`)
 
       let rs: number
       let rt: number
