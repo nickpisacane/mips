@@ -237,8 +237,8 @@ export default class Assembler {
           case 'sh':
           case 'sw':
             rt = registers[(node.args[0] as AST.RegisterNode).name]
-            imm = parseImmediate((node.args[1] as AST.ImmediateNode).value)
-            rs = registers[(node.args[2] as AST.RegisterNode).name]
+            imm = parseImmediate((node.args[1] as AST.OffsetNode).offset)
+            rs = registers[(node.args[1] as AST.OffsetNode).register]
             return new IInstruction(info.code, rs, rt, imm)
           default:
             rt = registers[(node.args[0] as AST.RegisterNode).name]
