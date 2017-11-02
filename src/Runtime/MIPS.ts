@@ -41,7 +41,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
   private io: IO
 
   public assembledObj: AssembledObject
-  public primaryRegisters: PrimaryRegisters
+  public registers: PrimaryRegisters
 
   private dataMemory: Memory
   private heapMemory: Memory
@@ -60,7 +60,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       stderr: options.stderr,
     })
 
-    this.primaryRegisters = new PrimaryRegisters()
+    this.registers = new PrimaryRegisters()
     this.assembledObj = assemble(parse(this.source))
     this.dataMemory = new Memory({
       baseAddress: constants.BASE_DATA_ADDR,
@@ -95,13 +95,13 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     const instr = this.assembledObj.objInstructions[index]
     await this.executeInstruction(instr)
 
-    this.primaryRegisters.set('pc', this.primaryRegisters.get('pc') + 4)
+    this.registers.set('pc', this.registers.get('pc') + 4)
     return true
   }
 
   private async executeInstruction(i: Instruction) {
     // TODO: Implement
-    const r = this.primaryRegisters
+    const r = this.registers
     let a: number
 
     if (i instanceof RInstruction) {
@@ -317,7 +317,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
   }
 
   private resolveInstructionIndex(): number {
-    const pc = this.primaryRegisters.get('pc')
+    const pc = this.registers.get('pc')
     return (pc - constants.BASE_TEXT_ADDR) / 4
   }
 
@@ -394,7 +394,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
   }
 
   private async syscall(code: number) {
-    const r = this.primaryRegisters
+    const r = this.registers
     console.log('syscall: ', code)
 
     switch (code) {
