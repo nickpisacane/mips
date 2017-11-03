@@ -1,4 +1,4 @@
-import { Writable } from 'stream'
+import { Readable, Writable } from 'stream'
 
 export class Collector extends Writable {
   private buf: string
@@ -16,5 +16,26 @@ export class Collector extends Writable {
 
   toString() {
     return this.buf
+  }
+}
+
+export class Input extends Readable {
+  private input: string
+  private done: boolean
+
+  constructor(input: string) {
+    super()
+
+    this.input = input
+    this.done = false
+  }
+
+  _read() {
+    if (!this.done) {
+      this.push(this.input)
+      this.done = true
+    } else {
+      this.push(null)
+    }
   }
 }
