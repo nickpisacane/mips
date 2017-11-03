@@ -142,9 +142,8 @@ export default class Parser {
   public parse(): AST.Root {
     let line: Token[] = this.nextLine()
     while (line.length) {
-      this.logTokens(line)
       let [ first, ...rest ] = line
-      this.logTokens(rest)
+
       if (first.type !== 'TEXT') {
         throw new Error('Unexpected Token Error')
       }
@@ -185,8 +184,6 @@ export default class Parser {
             rest = nextLine.slice(1)
           }
         }
-
-        this.logTokens(rest)
 
         if (this.inData) {
           if (first.type !== 'TEXT' && !/^\./.test(first.value)) {
