@@ -135,6 +135,21 @@ const transformers: {
   //    ori $at, $at, lower(imm)
   //    sltu $rt, $rs, $at
   'sltiu': (op: AST.OperationNode) => transformImmediate(op, 'sltu'),
+
+  // sgt $rd, $rs, $rt => slt $rd, $rt, $rs
+  'sgt': (op: AST.OperationNode) => new AST.TransformedNode([
+    new AST.OperationNode('slt', [ op.args[0], op.args[2], op.args[1] ]),
+  ]),
+
+  // seq $rd, $rs, $rt =>
+  //    subu $rd, $rs, $rt
+  //    ori  $at, $0, 1
+  //    sltu $rd, $rd, $at
+  'seq': (op: AST.OperationNode) => new AST.TransformedNode([
+    new AST.OperationNode('subu', op.args),
+    new AST.OperationNode('ori', [ $AT, $0, new AST.ImmediateNode('1') ]),
+    new AST.OperationNode('sltu', [ op.args[0], op.args[0], $AT ]),
+  ]),
 }
 
 const isOperationNode = (n: AST.Node): n is AST.OperationNode => (
