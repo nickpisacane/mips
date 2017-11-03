@@ -93,7 +93,12 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       return false
     }
     const instr = this.assembledObj.objInstructions[index]
-    await this.executeInstruction(instr)
+    try {
+      await this.executeInstruction(instr)
+    } catch (err) {
+      console.log(`INSTR[${index}]: `, instr)
+      throw err
+    }
 
     this.registers.set('pc', this.registers.get('pc') + 4)
     return true
@@ -107,7 +112,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     if (i instanceof RInstruction) {
       switch (i.func) {
         case OP_CODES.addu:
-          r.set(i.rd, int32.unsigned(int32.unsigned(r.get(i.rs)) + int32.unsigned(r.get(i.rt))))
+          r.set(i.rd, r.getUnsigned(i.rs) + r.getUnsigned(i.rt))
           break
 
         case OP_CODES.add:
@@ -386,7 +391,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     let ret = ''
     let c: number
     while ((c = this.readByte(address)) !== 0) {
-      // console.log('c: ', c)
       ret += String.fromCharCode(c)
       address++
     }
@@ -395,7 +399,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   private async syscall(code: number) {
     const r = this.registers
-    console.log('syscall: ', code)
 
     switch (code) {
       case 1:
@@ -408,7 +411,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
         break
       case 4:
         // print string
-        console.log('str: ', this.readASCIIString(r.get('$a0')))
         this.io.write(this.readASCIIString(r.get('$a0')))
         break
       case 5:
