@@ -1,6 +1,6 @@
 import { Readable, Writable } from 'stream'
 
-export class Collector extends Writable {
+export class Output extends Writable {
   private buf: string
 
   constructor() {
