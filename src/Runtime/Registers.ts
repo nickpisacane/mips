@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 
 import invertIndexTable from '../utils/invertIndexTable'
+import * as int32 from '../utils/int32'
 
 export interface RegisterOptions {
   size: number
@@ -52,12 +53,18 @@ export default class Registers extends EventEmitter implements RegistersEmitter 
     })
   }
 
-  public get(register: string | number) {
+  public get(register: string | number, signed: boolean = true): number {
     const index = typeof register === 'number' ? register : this.nameToIndex[register]
     if (typeof index === 'undefined' || index > this.size - 1) {
       throw new Error(`Registers: Register "${register}" is out of range.`)
     }
 
-    return this.registers[index]
+    const value = this.registers[index]
+
+    return signed ? int32.signed(value) : int32.unsigned(value)
+  }
+
+  public getUnsigned(register: string | number): number {
+    return this.get(register, false)
   }
 }
