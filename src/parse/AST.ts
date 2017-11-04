@@ -189,10 +189,13 @@ export class Root {
 
 // Psuedo-instructions will get replaced by these
 export class TransformedNode extends Node {
-  constructor(operations: OperationNode[]) {
+  public original: OperationNode
+
+  constructor(operations: OperationNode[], original: OperationNode) {
     super('TRANSFORMED')
 
     this.children = operations
+    this.original = original
   }
 }
 

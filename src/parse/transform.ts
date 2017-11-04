@@ -17,7 +17,7 @@ const transformImmediate = (op: AST.OperationNode, rOp: string): AST.Transformed
     new AST.OperationNode('lui', [ $AT, split[0] ]),
     new AST.OperationNode('ori', [ $AT, $AT, split[1] ]),
     new AST.OperationNode(rOp, [ op.args[0], op.args[1], $AT ]),
-  ])
+  ], op)
 }
 
 const transformers: {
@@ -29,7 +29,7 @@ const transformers: {
   'bge': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[0], op.args[1] ]),
     new AST.OperationNode('beq', [ $AT, $0, op.args[2] ]),
-  ]),
+  ], op),
 
   // bgt $rx, $ry, addr =>
   //    slt $at, $ry, $rx
@@ -37,7 +37,7 @@ const transformers: {
   'bgt': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[1], op.args[0] ]),
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
-  ]),
+  ], op),
 
   // ble $rx, $ry, addr =>
   //    slt $at, $ry, $rx
@@ -45,7 +45,7 @@ const transformers: {
   'ble': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[1], op.args[0] ]),
     new AST.OperationNode('beq', [ $AT, $0, op.args[2] ]),
-  ]),
+  ], op),
 
   // blt $rx, $ry, addr =>
   //    slt $at, $rx, $ry
@@ -53,7 +53,7 @@ const transformers: {
   'blt': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ $AT, op.args[0], op.args[1] ]),
     new AST.OperationNode('bne', [ $AT, $0, op.args[2] ]),
-  ]),
+  ], op),
 
   // la $rx, addr =>
   //    lui $at, upper(addr)
@@ -64,14 +64,14 @@ const transformers: {
     return new AST.TransformedNode([
       new AST.OperationNode('lui', [ $AT, addr.partition('upper') ]),
       new AST.OperationNode('ori', [ op.args[0], $AT, addr.partition('lower') ]),
-    ])
+    ], op)
   },
 
   // move $rx, $ry =>
   //    addu $rx, $0, $ry
   'move': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('addu', [ op.args[0], $0, op.args[1] ]),
-  ]),
+  ], op),
 
   // li $rx, imm =>
   //    addiu $rx, $0, imm
@@ -85,12 +85,12 @@ const transformers: {
     if (split.length == 1) {
       return new AST.TransformedNode([
         new AST.OperationNode('addiu', [ op.args[0], $0, op.args[1] ]),
-      ])
+      ], op)
     }
     return new AST.TransformedNode([
       new AST.OperationNode('lui', [ $AT, split[0] ]),
       new AST.OperationNode('ori', [ op.args[0], $AT, split[1] ]),
-    ])
+    ], op)
   },
 
   // addi $rt, $rs, imm ?=>
@@ -139,7 +139,7 @@ const transformers: {
   // sgt $rd, $rs, $rt => slt $rd, $rt, $rs
   'sgt': (op: AST.OperationNode) => new AST.TransformedNode([
     new AST.OperationNode('slt', [ op.args[0], op.args[2], op.args[1] ]),
-  ]),
+  ], op),
 
   // seq $rd, $rs, $rt =>
   //    subu $rd, $rs, $rt
@@ -149,7 +149,7 @@ const transformers: {
     new AST.OperationNode('subu', op.args),
     new AST.OperationNode('ori', [ $AT, $0, new AST.ImmediateNode('1') ]),
     new AST.OperationNode('sltu', [ op.args[0], op.args[0], $AT ]),
-  ]),
+  ], op),
 }
 
 const isOperationNode = (n: AST.Node): n is AST.OperationNode => (
