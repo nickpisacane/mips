@@ -11,7 +11,6 @@ import Instruction, {
   JInstruction,
 } from '../Instruction'
 import * as int32 from '../utils/int32'
-import invertIndexTable from '../utils/invertIndexTable'
 
 import * as constants from './constants'
 import PrimaryRegisters from './PrimaryRegisters'
@@ -105,15 +104,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     const r = this.registers
     let a: number
 
-    const inverted = invertIndexTable(OP_CODES)
-    const findCode = (code: number, type: string): string => {
-      return Object.keys(mappings.instructions).filter(k => {
-        return mappings.instructions[k].code === code && mappings.instructions[k].type === type
-      })[0]
-    }
-
     if (i instanceof RInstruction) {
-      // console.log('Executing (R): ', findCode(i.func, 'R'))
       switch (i.func) {
         case OP_CODES.addu:
           r.set(i.rd, r.getUnsigned(i.rs) + r.getUnsigned(i.rt))
@@ -207,7 +198,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           break
 
         case OP_CODES.jr:
-          // console.log('GOING TO: ', r.getUnsigned(i.rs))
           r.set('pc', r.getUnsigned(i.rs) - 4)
           break
 
@@ -224,7 +214,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           throw new Error(`Unknown R-type: ${i.func}`)
       }
     } else if (i instanceof IInstruction) {
-      // console.log('Executing (I): ', findCode(i.op, 'I'))
       switch (i.op) {
         case OP_CODES.addi:
           r.set(i.rt, r.get(i.rs) + i.imm)
@@ -356,7 +345,6 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   private writeByte(address: number, value: number) {
     const mem = this.resolveMemory(address)
-    // console.log('Stack?: ', address.toString(16), value, mem instanceof Stack)
     mem.set(address, value)
   }
 
