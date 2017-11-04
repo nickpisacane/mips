@@ -86,7 +86,7 @@ const expected = [
   { type: 'LEFT_PAREN', value: '(', lineno: 15, colno: 10 },
   { type: 'TEXT', value: '$sp', lineno: 15, colno: 11 },
   { type: 'RIGHT_PAREN', value: ')', lineno: 15, colno: 14 },
-  { type: 'EOL', value: '\n', lineno: 16, colno: 1 },
+  { type: 'EOL', value: '\n', lineno: 15, colno: 33 },
   { type: 'TEXT', value: 'li', lineno: 17, colno: 1 },
   { type: 'TEXT', value: '$v0', lineno: 17, colno: 4 },
   { type: 'COMMA', value: ',', lineno: 17, colno: 7 },
@@ -123,5 +123,27 @@ describe('Lexer', () => {
     const lexer = new Lexer(source)
     const tokens = lexer.lex()
     expect(tokens).to.deep.equal(expected)
+  })
+
+  it('end-of-line comments', () => {
+    const source = `
+      li $s0, 5 # foo
+      la $s1, bar
+    `
+    const lexer = new Lexer(source)
+    const tokens = lexer.lex()
+
+    expect(tokens).to.deep.equal([
+      { type: 'TEXT', value: 'li', lineno: 2, colno: 7 },
+      { type: 'TEXT', value: '$s0', lineno: 2, colno: 10 },
+      { type: 'COMMA', value: ',', lineno: 2, colno: 13 },
+      { type: 'TEXT', value: '5', lineno: 2, colno: 15 },
+      { type: 'EOL', value: '\n', lineno: 2, colno: 22 },
+      { type: 'TEXT', value: 'la', lineno: 3, colno: 7 },
+      { type: 'TEXT', value: '$s1', lineno: 3, colno: 10 },
+      { type: 'COMMA', value: ',', lineno: 3, colno: 13 },
+      { type: 'TEXT', value: 'bar', lineno: 3, colno: 15 },
+      { type: 'EOS', value: '%EOS%', lineno: 4, colno: 5 },
+    ])
   })
 })

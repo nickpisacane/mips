@@ -108,12 +108,12 @@ export default class Lexer {
           break
         case '\n':
           this.flush()
-          this.pushSpecial('EOL', c)
-          this.lineno++
-          this.colno = 0
           if (this.inComment) {
             this.inComment = false
           }
+          this.pushSpecial('EOL', c)
+          this.lineno++
+          this.colno = 0
           break
 
         // Everything else
