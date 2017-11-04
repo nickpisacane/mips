@@ -197,6 +197,10 @@ export class TransformedNode extends Node {
     this.children = operations
     this.original = original
   }
+
+  public toString(): string {
+    return this.children.map(c => c.toString()).join('\n')
+  }
 }
 
 export const utils = {
