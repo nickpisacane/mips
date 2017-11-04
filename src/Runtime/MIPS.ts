@@ -11,6 +11,7 @@ import Instruction, {
   JInstruction,
 } from '../Instruction'
 import * as int32 from '../utils/int32'
+import invertIndexTable from '../utils/invertIndexTable'
 
 import * as constants from './constants'
 import PrimaryRegisters from './PrimaryRegisters'
@@ -74,7 +75,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     })
     this.stack = new Stack({
       size: 1024,
-      lastAddress: constants.BASE_STACK_POINTER,
+      end: constants.BASE_STACK_POINTER,
     })
 
     this.exited = false
@@ -93,14 +94,9 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       return false
     }
     const instr = this.assembledObj.objInstructions[index]
-    try {
-      await this.executeInstruction(instr)
-    } catch (err) {
-      console.log(`INSTR[${index}]: `, instr)
-      throw err
-    }
+    await this.executeInstruction(instr)
 
-    this.registers.set('pc', this.registers.get('pc') + 4)
+    this.registers.set('pc', this.registers.getUnsigned('pc') + 4)
     return true
   }
 
@@ -109,7 +105,15 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     const r = this.registers
     let a: number
 
+    const inverted = invertIndexTable(OP_CODES)
+    const findCode = (code: number, type: string): string => {
+      return Object.keys(mappings.instructions).filter(k => {
+        return mappings.instructions[k].code === code && mappings.instructions[k].type === type
+      })[0]
+    }
+
     if (i instanceof RInstruction) {
+      // console.log('Executing (R): ', findCode(i.func, 'R'))
       switch (i.func) {
         case OP_CODES.addu:
           r.set(i.rd, r.getUnsigned(i.rs) + r.getUnsigned(i.rt))
@@ -203,12 +207,13 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           break
 
         case OP_CODES.jr:
-          r.set('pc', r.get(i.rs) - 4)
+          // console.log('GOING TO: ', r.getUnsigned(i.rs))
+          r.set('pc', r.getUnsigned(i.rs) - 4)
           break
 
         case OP_CODES.jalr:
-          r.set('$ra', r.get('pc') + 4)
-          r.set('pc', r.get(i.rs))
+          r.set('$ra', r.getUnsigned('pc') + 4)
+          r.set('pc', r.getUnsigned(i.rs))
           break
 
         case OP_CODES.syscall:
@@ -219,6 +224,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           throw new Error(`Unknown R-type: ${i.func}`)
       }
     } else if (i instanceof IInstruction) {
+      // console.log('Executing (I): ', findCode(i.op, 'I'))
       switch (i.op) {
         case OP_CODES.addi:
           r.set(i.rt, r.get(i.rs) + i.imm)
@@ -285,15 +291,15 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           break
 
         case OP_CODES.sb:
-          this.writeByte(r.get(i.rs) + i.imm, r.get(i.rt))
+          this.writeByte(r.getUnsigned(i.rs) + i.imm, r.get(i.rt))
           break
 
         case OP_CODES.sh:
-          this.writeHalf(r.get(i.rs) + i.imm, r.get(i.rt))
+          this.writeHalf(r.getUnsigned(i.rs) + i.imm, r.get(i.rt))
           break
 
         case OP_CODES.sw:
-          this.writeWord(r.get(i.rs) + i.imm, r.get(i.rt))
+          this.writeWord(r.getUnsigned(i.rs) + i.imm, r.get(i.rt))
           break
 
         case OP_CODES.ll:
@@ -305,9 +311,11 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
           this.writeWord(r.get(i.rs) + i.imm, r.get(i.rt))
           r.set(i.rt, 1)
           break
-
+        default:
+          throw new Error(`Unknow I instruction: ${i.op}`)
       }
     } else if (i instanceof JInstruction) {
+      // console.log('Executing (J): ', findCode(i.j, 'J'))
       switch (i.j) {
         case OP_CODES.j:
           r.set('pc', i.addr - 4)
@@ -334,7 +342,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     if (address >= begOfData && address < endOfData) {
       return this.dataMemory
     }
-    if (address <= endOfStack) {
+    if (address < endOfStack) {
       return this.stack
     }
     return this.heapMemory
@@ -348,6 +356,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   private writeByte(address: number, value: number) {
     const mem = this.resolveMemory(address)
+    // console.log('Stack?: ', address.toString(16), value, mem instanceof Stack)
     mem.set(address, value)
   }
 

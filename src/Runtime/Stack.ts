@@ -2,24 +2,25 @@ import Memory from './Memory'
 
 export interface StackOptions {
   size: number
-  lastAddress: number
+  end: number
 }
 
 // Stack overrides Memory's `resolveIndex` and `resolveAddress` to provide a LIFO interface
 export default class Stack extends Memory {
-  private lastAddress: number
+  private end: number
 
-  constructor({ lastAddress, size }: StackOptions) {
+  constructor({ end, size }: StackOptions) {
     super({ size })
+    this.end = end
   }
 
   // Override => last address = first index...
   protected resolveIndex(address: number): number {
-    return address - this.lastAddress
+    return this.end - 1 - address
   }
 
   // Override => first index = last address...
   protected resolveAddress(index: number): number {
-    return this.lastAddress - index
+    return this.end - 1 + index
   }
 }
