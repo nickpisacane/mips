@@ -22,6 +22,10 @@ export class Node {
   public add(node: Node) {
     this.children.push(node)
   }
+
+  public toString(): string {
+    return '[MIPS Node]'
+  }
 }
 
 export class DirectiveNode extends Node {
@@ -31,6 +35,10 @@ export class DirectiveNode extends Node {
     super('DIRECTIVE')
 
     this.directiveType = directiveType
+  }
+
+  public toString(): string {
+    return `.${this.directiveType}`
   }
 }
 
@@ -44,6 +52,10 @@ export class DataNode extends Node {
     this.dataDirective = dataDirective
     this.values = values
   }
+
+  public toString(): string {
+    return this.values.join(', ')
+  }
 }
 
 export class LabelNode extends Node {
@@ -54,6 +66,10 @@ export class LabelNode extends Node {
 
     this.name = name
   }
+
+  public toString(): string {
+    return `${this.name}:`
+  }
 }
 
 export class RegisterNode extends Node {
@@ -63,6 +79,10 @@ export class RegisterNode extends Node {
     super('REGISTER')
 
     this.name = name
+  }
+
+  public toString(): string {
+    return this.name
   }
 }
 
@@ -88,6 +108,10 @@ export class ImmediateNode extends Node {
 
     return ret
   }
+
+  public toString(): string {
+    return this.value
+  }
 }
 
 export class OffsetNode extends Node {
@@ -99,6 +123,10 @@ export class OffsetNode extends Node {
 
     this.offset = offset
     this.register = register
+  }
+
+  public toString(): string {
+    return `${this.offset}(${this.register})`
   }
 }
 
@@ -121,6 +149,10 @@ export class AddressNode extends Node {
 
     return addr
   }
+
+  public toString(): string {
+    return this.label
+  }
 }
 
 export type ArgumentNode =
@@ -138,6 +170,10 @@ export class OperationNode extends Node {
 
     this.name = name
     this.args = args
+  }
+
+  public toString(): string {
+    return `${this.name} ${this.args.map(a => a.toString()).join(', ')}`
   }
 }
 
