@@ -3,7 +3,7 @@ import { expect } from 'chai'
 
 import { Input, Output } from '../helpers'
 
-import MIPS from '../../src/Runtime/MIPS'
+import MIPS from '../../src/runtime/MIPS'
 import * as int32 from '../../src/utils/int32'
 
 describe('MIPS', () => {

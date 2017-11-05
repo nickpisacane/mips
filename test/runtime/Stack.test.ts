@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
-import Stack from '../../src/Runtime/Stack'
-import { BASE_STACK_POINTER } from '../../src/Runtime/constants'
+import Stack from '../../src/runtime/Stack'
+import { BASE_STACK_POINTER } from '../../src/runtime/constants'
 
 describe('Stack', () => {
   it('LIFO', () => {
