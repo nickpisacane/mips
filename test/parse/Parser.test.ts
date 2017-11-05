@@ -20,7 +20,11 @@ describe('Parser', () => {
           new AST.RegisterNode('$0'),
           new AST.AddressNode('end'),
         ]),
-      ]),
+      ], new AST.OperationNode('bge', [
+        new AST.RegisterNode('$t1'),
+        new AST.RegisterNode('$t2'),
+        new AST.AddressNode('end'),
+      ])),
     ]
 
     const tokens = new Lexer(source).lex()
@@ -32,7 +36,7 @@ describe('Parser', () => {
 
   it('transforms immediate instructions', () => {
     const source = `
-    addi $t1, $t2, 0xfffffffff
+    addi $t1, $t2, 0xffffffff
     `
 
     const tokens = new Lexer(source).lex()
@@ -54,7 +58,11 @@ describe('Parser', () => {
           new AST.RegisterNode('$t2'),
           new AST.RegisterNode('$at'),
         ]),
-      ]),
+      ], new AST.OperationNode('addi', [
+        new AST.RegisterNode('$t1'),
+        new AST.RegisterNode('$t2'),
+        new AST.ImmediateNode('0xffffffff'),
+      ])),
     ])
   })
 
@@ -82,7 +90,11 @@ describe('Parser', () => {
           new AST.RegisterNode('$t2'),
           new AST.RegisterNode('$at'),
         ]),
-      ]),
+      ], new AST.OperationNode('andi', [
+        new AST.RegisterNode('$t1'),
+        new AST.RegisterNode('$t2'),
+        new AST.ImmediateNode('-1'),
+      ])),
     ])
   })
 })
