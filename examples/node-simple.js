@@ -131,7 +131,7 @@ sortArrayReturn:
 # END sortArray()
 `
 // const MIPS = require('mips')
-const MIPS = require('../build/src').default
+const MIPS = require('../lib').default
 
 const mips = new MIPS({
   stdin: process.stdin,
