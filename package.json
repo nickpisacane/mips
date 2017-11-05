@@ -1,10 +1,13 @@
 {
   "name": "mips",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.1",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "test": "ts-mocha test/**/*.test.ts"
+    "test": "__TS_PROJECT_PATH__=./test ts-mocha test/**/*.test.ts",
+    "cln": "rm -rf lib/*",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",
@@ -15,5 +18,8 @@
     "ts-mocha": "^1.0.3",
     "typescript": "^2.5.3",
     "watch-run": "^1.2.5"
+  },
+  "dependencies": {
+    "tslib": "^1.8.0"
   }
 }
