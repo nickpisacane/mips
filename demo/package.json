@@ -1,0 +1,35 @@
+{
+  "name": "mips-demo",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server --open --config ./webpack.config.dev.js",
+    "build": "webpack --config ./webpack.config.prod.js"
+  },
+  "devDependencies": {
+    "@types/material-ui": "^0.18.3",
+    "@types/react": "^16.0.20",
+    "@types/react-dom": "^16.0.2",
+    "@types/react-redux": "^5.0.12",
+    "@types/react-tap-event-plugin": "^0.0.30",
+    "@types/redux": "^3.6.0",
+    "@types/redux-logger": "^3.0.5",
+    "@types/redux-thunk": "^2.1.0",
+    "awesome-typescript-loader": "^3.3.0",
+    "typescript": "^2.6.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  },
+  "dependencies": {
+    "material-ui": "^0.19.4",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-redux": "^5.0.6",
+    "react-tap-event-plugin": "^3.0.2",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
+  }
+}
