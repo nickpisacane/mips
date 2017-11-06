@@ -8,11 +8,13 @@
     "postinstall": "npm run cln-split-pane",
     "start": "webpack-dev-server --open --config ./webpack.config.dev.js",
     "build": "webpack --config ./webpack.config.prod.js",
-    "cln-split-pane": "rm -rf node_modules/react-split-pane/index.d.ts"
+    "cln-split-pane": "rm -rf node_modules/react-split-pane/index.d.ts",
+    "copy-codemirror-styles": "cp ./node_modules/codemirror/lib/codemirror.css ../docs/styles/codemirror.css"
   },
   "devDependencies": {
     "@types/material-ui": "^0.18.3",
     "@types/react": "^16.0.20",
+    "@types/react-codemirror": "^1.0.0",
     "@types/react-dom": "^16.0.2",
     "@types/react-redux": "^5.0.12",
     "@types/react-split-pane": "^0.1.10",
@@ -28,6 +30,7 @@
   "dependencies": {
     "material-ui": "^0.19.4",
     "react": "^16.0.0",
+    "react-codemirror": "^1.0.0",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
     "react-split-pane": "^0.1.68",
