@@ -141,6 +141,7 @@ const mips = new MIPS({
 })
 
 const main = async () => {
+	mips.assemble()
   await mips.execute()
 }
 
