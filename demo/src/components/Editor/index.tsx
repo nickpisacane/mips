@@ -23,6 +23,7 @@ export default class Editor extends React.Component<Props> {
 
     return (
       <CodeMirror
+        autoCursor={false}
         value={code}
         onChange={this.handleChange}
         options={{
