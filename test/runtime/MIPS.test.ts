@@ -31,7 +31,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
-
+    mips.assemble()
     await mips.execute()
 
     expect(stdout.toString()).to.equal('Hello, World\n42')
@@ -56,7 +56,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
-
+    mips.assemble()
     await mips.execute()
 
     expect(mips.registers.get('$a0')).to.equal(42)
@@ -76,6 +76,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
+    mips.assemble()
 
     await mips.execute()
 
@@ -112,6 +113,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
+    mips.assemble()
 
     await mips.execute()
 
@@ -135,6 +137,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
+    mips.assemble()
 
     await mips.execute()
 
@@ -172,6 +175,7 @@ describe('MIPS', () => {
       stderr,
       stdin: process.stdin as any,
     })
+    mips.assemble()
 
     await mips.execute()
 
@@ -194,6 +198,7 @@ describe('MIPS', () => {
       stdout,
       stderr,
     })
+    mips.assemble()
 
     await mips.execute()
 
