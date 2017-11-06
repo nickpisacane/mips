@@ -33,7 +33,7 @@ export type ConsoleAction = AppendAction | ClearAction
 
 /**
  * Console State interface
- * 
+ *
  * `data` represents the current console buffer
  */
 export interface ConsoleState {
@@ -54,7 +54,7 @@ export default function consleReducer(
   state: ConsoleState = initialState,
   action: ConsoleAction
 ): ConsoleState {
-  
+
   switch (action.type) {
     case CONSOLE_APPEND:
       return Object.assign({}, {
