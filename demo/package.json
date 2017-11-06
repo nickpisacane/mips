@@ -14,7 +14,6 @@
   "devDependencies": {
     "@types/material-ui": "^0.18.3",
     "@types/react": "^16.0.20",
-    "@types/react-codemirror": "^1.0.0",
     "@types/react-dom": "^16.0.2",
     "@types/react-redux": "^5.0.12",
     "@types/react-split-pane": "^0.1.10",
@@ -28,9 +27,10 @@
     "webpack-dev-server": "^2.9.4"
   },
   "dependencies": {
+    "codemirror": "^5.31.0",
     "material-ui": "^0.19.4",
     "react": "^16.0.0",
-    "react-codemirror": "^1.0.0",
+    "react-codemirror2": "^3.0.7",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
     "react-split-pane": "^0.1.68",
