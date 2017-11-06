@@ -21,4 +21,4 @@ export default connect<
   {
     onData: (data: string) => void
   }
->(mapStateToProps, mapDispatchToProps)(Console)
+>(mapStateToProps, mapDispatchToProps, null, { withRef: true })(Console)
