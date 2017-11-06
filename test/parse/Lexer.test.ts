@@ -146,4 +146,31 @@ describe('Lexer', () => {
       { type: 'EOS', value: '%EOS%', lineno: 4, colno: 5 },
     ])
   })
+
+  it('no end of line', () => {
+    const source = 'li $a0, 1'
+    const tokens = new Lexer(source).lex()
+
+    expect(tokens).to.deep.equal([
+      { type: 'TEXT', value: 'li', lineno: 1, colno: 1 },
+      { type: 'TEXT', value: '$a0', lineno: 1, colno: 4 },
+      { type: 'COMMA', value: ',', lineno: 1, colno: 7 },
+      { type: 'TEXT', value: '1', lineno: 1, colno: 9 },
+      { type: 'EOS', value: '%EOS%', lineno: 1, colno: 10 },
+    ])
+  })
+
+  it('ends-in-comment', () => {
+    const source = `li $v0, 1
+    # yep`
+    const tokens = new Lexer(source).lex()
+
+    expect(tokens).to.deep.equal([
+      { type: 'TEXT', value: 'li', lineno: 1, colno: 1 },
+      { type: 'TEXT', value: '$v0', lineno: 1, colno: 4 },
+      { type: 'COMMA', value: ',', lineno: 1, colno: 7 },
+      { type: 'TEXT', value: '1', lineno: 1, colno: 9 },
+      { type: 'EOS', value: '%EOS%', lineno: 2, colno: 10 },
+    ])
+  })
 })

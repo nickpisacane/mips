@@ -122,10 +122,14 @@ export default class Lexer {
             this.value += c
           }
       }
-
-
       this.colno++
     })
+
+    if (!this.inComment) {
+      this.flush()
+    } else {
+      this.inComment = false
+    }
 
     this.pushSpecial('EOS', '%EOS%')
 
