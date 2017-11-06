@@ -4,6 +4,22 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "license": "MIT",
+  "description": "MIPS assembler/interpreter",
+  "author": {
+    "email": "pisacanen@gmail.com",
+    "name": "Nick Pisacane",
+    "url": "https://github.com/nickpisacane"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nickpisacane/mips"
+  },
+  "keywords": [
+    "mips",
+    "assembler",
+    "interpreter",
+    "assembly"
+  ],
   "scripts": {
     "test": "__TS_PROJECT_PATH__=./test ts-mocha test/**/*.test.ts",
     "cln": "rm -rf lib/*",
