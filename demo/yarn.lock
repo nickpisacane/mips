@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@types/codemirror@^0.0.50":
+  version "0.0.50"
+  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.50.tgz#2456110e428b5bb9ade335d4bba64f90718b780f"
+
 "@types/inline-style-prefixer@^3.0.0":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/inline-style-prefixer/-/inline-style-prefixer-3.0.1.tgz#8541e636b029124b747952e9a28848286d2b5bf6"
