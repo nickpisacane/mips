@@ -1,5 +1,8 @@
 import * as React from 'react'
-import * as CodeMirror from 'react-codemirror'
+import {
+  UnControlled as CodeMirror,
+  IInstance,
+} from 'react-codemirror2'
 
 export interface Props {
   code: string
@@ -7,6 +10,10 @@ export interface Props {
 }
 
 export default class Editor extends React.Component<Props> {
+  private handleChange = (editor: IInstance, data: any, value: string) => {
+    this.props.onUpdateCode(value)
+  }
+
   render() {
     const {
       code,
@@ -17,7 +24,7 @@ export default class Editor extends React.Component<Props> {
     return (
       <CodeMirror
         value={code}
-        onChange={onUpdateCode}
+        onChange={this.handleChange}
         options={{
           lineNumbers: true,
         }}
