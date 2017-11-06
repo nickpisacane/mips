@@ -59,7 +59,13 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
       stdout: options.stdout,
       stderr: options.stderr,
     })
+  }
 
+  public updateSource(source: string) {
+    this.source = source
+  }
+
+  public assemble() {
     this.registers = new PrimaryRegisters()
     this.assembledObj = assemble(parse(this.source))
     this.dataMemory = new Memory({
@@ -78,6 +84,10 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     })
 
     this.exited = false
+  }
+
+  public isAssembled(): boolean {
+    return !!this.assembledObj
   }
 
   public async execute(): Promise<void> {
