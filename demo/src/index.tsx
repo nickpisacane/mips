@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 
 import createStore from './createStore'
 import App from './containers/App'
+import Badge from './components/Badge'
 
 injectTapEventPlugin()
 
@@ -15,6 +16,7 @@ render((
   <Provider store={store}>
     <MuiThemeProvider>
       <App />
+      <Badge />
     </MuiThemeProvider>
   </Provider>
 ), document.querySelector('#app'))
