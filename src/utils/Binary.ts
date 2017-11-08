@@ -64,7 +64,7 @@ export default class Binary {
   }
 
   public getValue(): number {
-    return this.getRange(0, this.size)
+    return this.getRange(0, this.size - 1)
   }
 
   public valueOf(): number {
