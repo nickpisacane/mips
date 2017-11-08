@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "test": "__TS_PROJECT_PATH__=./test ts-mocha test/**/*.test.ts",
+    "test:module": "__TS_PROJECT_PATH__=./test ts-mocha",
     "cln": "rm -rf lib/*",
     "build": "tsc"
   },
