@@ -11,12 +11,14 @@ import Instruction, {
   JInstruction,
 } from '../Instruction'
 import * as int32 from '../utils/int32'
+import * as float from '../utils/float'
 
 import * as constants from './constants'
 import PrimaryRegisters from './PrimaryRegisters'
 import Memory from './Memory'
 import Stack from './Stack'
 import IO from './IO'
+import FPRegisters from './FPRegisters'
 
 const OP_CODES: { [key: string]: number } =
   Object.keys(mappings.instructions).reduce((opCodes, op) => {
@@ -42,6 +44,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   public assembledObj: AssembledObject
   public registers: PrimaryRegisters
+  public fpRegisters: FPRegisters
 
   private dataMemory: Memory
   private heapMemory: Memory
@@ -67,6 +70,7 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
 
   public assemble() {
     this.registers = new PrimaryRegisters()
+    this.fpRegisters = new FPRegisters()
     this.assembledObj = assemble(parse(this.source))
     this.dataMemory = new Memory({
       baseAddress: constants.BASE_DATA_ADDR,
@@ -392,6 +396,35 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     mem.set(address + 1, (value & 0x00ff0000) >>> 16)
     mem.set(address + 2, (value & 0x0000ff00) >>> 8)
     mem.set(address + 3, (value & 0x000000ff))
+  }
+
+  public writeSingle(address: number, value: number) {
+    const mem = this.resolveMemory(address)
+    const binary = float.singleToBinary(value)
+    const int8Arr = binary.toUint8Array()
+    for (let i = 0; i < int8Arr.length; i++) {
+      mem.set(address + i, int8Arr[i])
+    }
+  }
+
+  public readSingle(address: number): number {
+    const mem = this.resolveMemory(address)
+    const int8Arr = new Uint8Array(4)
+
+    for (let i = 0; i < int8Arr.length; i++) {
+      int8Arr[i] = mem.get(address + i)
+    }
+
+    return float.singleFromBinary(int8Arr)
+  }
+
+  public writeDouble(address: number, value: number) {
+    // TODO
+  }
+
+  public readDouble(address: number): number {
+    // TODO
+    return 42
   }
 
   private readASCIIString(address: number): string {
