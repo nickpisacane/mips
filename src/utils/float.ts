@@ -130,11 +130,11 @@ export const doubleFromBinary = (binaryLike: BinaryLike): number => {
   return 42
 }
 
-export const binaryFromSingle = (single: number): Binary => {
+export const singleToBinary = (single: number): Binary => {
   // TODO: Implement
   return new Binary(0)
 }
 
-export const binaryFromDouble = (double: number): Binary => {
+export const doubleToBinary = (double: number): Binary => {
   return new Binary(0)
 }
