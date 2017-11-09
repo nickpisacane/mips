@@ -2,7 +2,7 @@ import Binary from './Binary'
 
 type BinaryLike = Binary | Uint8Array | Uint32Array
 
-const toBinary = (binaryLike: BinaryLike) => {
+const toBinary = (binaryLike: BinaryLike): Binary => {
   if (binaryLike instanceof Binary) {
     return binaryLike
   }
@@ -12,6 +12,10 @@ const toBinary = (binaryLike: BinaryLike) => {
   if (binaryLike instanceof Uint8Array) {
     return Binary.fromUint8Array(binaryLike)
   }
+
+  throw new Error(
+    `Unsupported conversion to Binary for type: "${typeof binaryLike}"`
+  )
 }
 
 export interface FloatConversionOptions {
@@ -118,23 +122,50 @@ export const floatFromBinary = (options: FloatFromBinaryOptions): number => {
   return value
 }
 
+export const SINGLE_MANTISSA = 23
+export const SINGLE_EXPONENT = 8
+export const SINGLE_BIAS     = 127
+
+export const DOUBLE_MANTISSA = 52
+export const DOUBLE_EXPONENT = 11
+export const DOUBLE_BIAS     = 1023
+
 export const singleFromBinary = (binaryLike: BinaryLike): number => {
   const binary = toBinary(binaryLike)
-  // TODO: Implement
-  return 42
+
+  return floatFromBinary({
+    binary,
+    sizeOfExp: SINGLE_EXPONENT,
+    sizeOfMantissa: SINGLE_MANTISSA,
+    bias: SINGLE_BIAS,
+  })
 }
 
 export const doubleFromBinary = (binaryLike: BinaryLike): number => {
   const binary = toBinary(binaryLike)
-  // TODO: Implement
-  return 42
+
+  return floatFromBinary({
+    binary,
+    sizeOfExp: DOUBLE_EXPONENT,
+    sizeOfMantissa: DOUBLE_MANTISSA,
+    bias: DOUBLE_BIAS,
+  })
 }
 
 export const singleToBinary = (single: number): Binary => {
-  // TODO: Implement
-  return new Binary(0)
+  return floatToBinary({
+    value: single,
+    sizeOfExp: SINGLE_EXPONENT,
+    sizeOfMantissa: SINGLE_MANTISSA,
+    bias: SINGLE_BIAS,
+  })
 }
 
 export const doubleToBinary = (double: number): Binary => {
-  return new Binary(0)
+  return floatToBinary({
+    value: double,
+    sizeOfExp: DOUBLE_EXPONENT,
+    sizeOfMantissa: DOUBLE_MANTISSA,
+    bias: DOUBLE_BIAS,
+  })
 }
