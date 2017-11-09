@@ -71,6 +71,16 @@ export default class Binary {
     return this.getValue()
   }
 
+  public toString(): string {
+    let ret = ''
+
+    for (let i = this.size - 1; i >= 0; i--) {
+      ret += this.getBit(i)
+    }
+
+    return ret
+  }
+
   public toUint8Array() {
     const clone = new Uint8Array(this.size / 8)
 
