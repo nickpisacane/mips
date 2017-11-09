@@ -398,33 +398,41 @@ export default class MIPS extends EventEmitter implements MIPSEmitter {
     mem.set(address + 3, (value & 0x000000ff))
   }
 
-  public writeSingle(address: number, value: number) {
+  private writeFloat(address: number, value: number, single: boolean = true) {
     const mem = this.resolveMemory(address)
-    const binary = float.singleToBinary(value)
+    const binary = single ? float.singleToBinary(value) : float.doubleToBinary(value)
     const int8Arr = binary.toUint8Array()
+
     for (let i = 0; i < int8Arr.length; i++) {
       mem.set(address + i, int8Arr[i])
     }
   }
 
-  public readSingle(address: number): number {
+  private readFloat(address: number, single: boolean = true) {
     const mem = this.resolveMemory(address)
-    const int8Arr = new Uint8Array(4)
+    const int8Arr = new Uint8Array(single ? 4 : 8)
 
     for (let i = 0; i < int8Arr.length; i++) {
       int8Arr[i] = mem.get(address + i)
     }
 
-    return float.singleFromBinary(int8Arr)
+    return single ? float.singleFromBinary(int8Arr) : float.doubleFromBinary(int8Arr)
+  }
+
+  public writeSingle(address: number, value: number) {
+    return this.writeFloat(address, value)
+  }
+
+  public readSingle(address: number): number {
+    return this.readFloat(address)
   }
 
   public writeDouble(address: number, value: number) {
-    // TODO
+    return this.writeFloat(address, value, false)
   }
 
   public readDouble(address: number): number {
-    // TODO
-    return 42
+    return this.readFloat(address, false)
   }
 
   private readASCIIString(address: number): string {
