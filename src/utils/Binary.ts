@@ -95,6 +95,7 @@ export default class Binary {
     const size32 = this.size / 32
     const clone = new Uint32Array(size32)
 
+    // TODO: Fix this
     for (let i = 0; i < size32; i++) {
       clone[i] =
         this.buf[i + 0] |
