@@ -8,6 +8,7 @@ import Instruction, {
 import {
   registers,
   instructions,
+  fpRegisters,
 } from '../utils/mappings'
 import parseImmediate from '../utils/parseImmediate'
 import { fromAST } from '../Data'
@@ -214,6 +215,18 @@ export default class Assembler {
             rt = registers[(node.args[1] as AST.RegisterNode).name]
             rs = registers[(node.args[2] as AST.RegisterNode).name]
             return new RInstruction(0, rs, rt, rd, 0, info.code)
+          // Moves
+          case 'mfc0':
+          case 'mfc1':
+            rt = registers[(node.args[0]  as AST.RegisterNode).name]
+            rd = registers[(node.args[1] as AST.RegisterNode).name]
+            return new RInstruction(node.name === 'mfc0' ? 0x10 : 0x11, 0, rt, rd, 0, info.code)
+          case 'mtc0':
+          case 'mtc1':
+            rt = registers[(node.args[0]  as AST.RegisterNode).name]
+            // fd
+            rd = registers[(node.args[1] as AST.RegisterNode).name]
+            return new RInstruction(node.name === 'mtc0' ? 0x10 : 0x11, 0, rt, rd, 0, info.code)
           default:
             rd = registers[(node.args[0] as AST.RegisterNode).name]
             rs = registers[(node.args[1] as AST.RegisterNode).name]
