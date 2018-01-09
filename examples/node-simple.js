@@ -2,7 +2,7 @@ const source = `
 .data
 prompt: .asciiz "Enter a number: "
 orig: .asciiz "The array in original order:\n"
-rev: .asciiz "\nThe array in swaped order:\n"
+rev: .asciiz "\nThe array in swapped order:\n"
 array: .word 0,0,0,0,0
 endl: .asciiz "\n"
     .text
