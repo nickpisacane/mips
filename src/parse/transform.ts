@@ -154,7 +154,7 @@ const transformers: {
   // nop =>
   //    sll $at, $at, $0
   'nop': (op: AST.OperationNode) => new AST.TransformedNode([
-    new AST.OperationNode('sll', [ $AT, $AT, $0 ]),
+    new AST.OperationNode('sll', [ $AT, $0, $0 ]),
   ], op),
 }
 
