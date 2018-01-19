@@ -207,6 +207,7 @@ describe('MIPS', () => {
 
   it('nop support', async () => {
     const source = `
+      addi $at, $0, 42
       nop
     `
 
@@ -224,7 +225,8 @@ describe('MIPS', () => {
     mips.assemble()
 
     await mips.execute()
-    expect(mips.registers.get('$at')).to.equal(0)
+
+    expect(mips.registers.get('$at')).to.equal(42)
     expect(mips.registers.get('$0')).to.equal(0)
   })
 })
