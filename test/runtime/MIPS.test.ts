@@ -204,4 +204,27 @@ describe('MIPS', () => {
 
     expect(mips.registers.get('$v0')).to.equal(42)
   })
+
+  it('nop support', async () => {
+    const source = `
+      nop
+    `
+
+    const stdin = new Input('')
+    const stdout = new Output()
+    const stderr = new Output()
+
+    const mips = new MIPS({
+      source,
+      stdin,
+      stdout,
+      stderr,
+    })
+
+    mips.assemble()
+
+    await mips.execute()
+    expect(mips.registers.get('$at')).to.equal(0)
+    expect(mips.registers.get('$0')).to.equal(0)
+  })
 })
