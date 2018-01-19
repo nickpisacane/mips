@@ -150,6 +150,12 @@ const transformers: {
     new AST.OperationNode('ori', [ $AT, $0, new AST.ImmediateNode('1') ]),
     new AST.OperationNode('sltu', [ op.args[0], op.args[0], $AT ]),
   ], op),
+
+  // nop =>
+  //    sll $at, $at, $0
+  'nop': (op: AST.OperationNode) => new AST.TransformedNode([
+    new AST.OperationNode('sll', [ $AT, $AT, $0 ]),
+  ], op),
 }
 
 const isOperationNode = (n: AST.Node): n is AST.OperationNode => (
