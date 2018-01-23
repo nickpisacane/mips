@@ -25,7 +25,7 @@ export default class Badge extends React.Component {
     return (
       <Container>
         <Anchor
-          href='https://github.com/nickpisacane'
+          href='https://github.com/nickpisacane/mips'
           target='_blank'
         >
           <CodeIcon style={{marginRight: '6px'}} color={iconColor}/> by Nick Pisacane
