@@ -24,7 +24,7 @@ export default class FIInstruction implements Instruction {
   }
 
   public toInt(): number {
-    const { op, fmt, ft, fs, imm } = this
+    const { op, fmt, ft, imm } = this
     return (op << OP_SHIFT) + (fmt << FMT_SHIFT) + (ft << FT_SHIFT) + imm
   }
 }
