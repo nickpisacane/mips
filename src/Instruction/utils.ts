@@ -2,6 +2,8 @@ import Instruction from './Instruction'
 import RInstruction from './RInstruction'
 import JInstruction from './JInstruction'
 import IInstruction from './IInstruction'
+import FIInstruction from './FIInstruction'
+import FRInstruction from './FRInstruction'
 
 import {
   OP_MASK,
@@ -20,6 +22,14 @@ import {
   IMM_SHIFT,
   ADDR_MASK,
   ADDR_SHIFT,
+  FMT_MASK,
+  FMT_SHIFT,
+  FT_MASK,
+  FT_SHIFT,
+  FD_MASK,
+  FD_SHIFT,
+  FS_MASK,
+  FS_SHIFT,
 } from './constants'
 
 export default {
@@ -39,6 +49,23 @@ export default {
       const addr = (instr & ADDR_MASK) >>> ADDR_SHIFT
       return new JInstruction(op, addr)
     }
+    if (op === 0x11) {
+      // FR or FI type
+      const fmt = (instr & FMT_MASK) >>> FMT_SHIFT
+      const ft  = (instr & FT_MASK)  >>> FT_SHIFT
+
+      if (fmt === 0x8) {
+        const imm = (instr & IMM_MASK) >>> IMM_SHIFT;
+        return new FIInstruction(op, fmt, ft, imm)
+      }
+
+      const fs = (instr & FS_MASK) >>> FS_SHIFT
+      const fd = (instr & FD_MASK) >>> FD_SHIFT
+      const func = (instr & FUNC_MASK) >>> FUNC_SHIFT
+
+      return new FRInstruction(op, fmt, ft, fs, fd, func)
+
+    }
 
     const rs = (instr & RS_MASK) >>> RS_SHIFT
     const rt = (instr & RT_MASK) >>> RT_SHIFT
@@ -57,5 +84,13 @@ export default {
 
   isJ(instr: Instruction): instr is JInstruction {
     return instr.type === 'J'
+  },
+
+  isFR(instr: Instruction): instr is FRInstruction {
+    return instr.type === 'FR'
+  },
+
+  isFI(instr: Instruction): instr is FIInstruction {
+    return instr.type === 'FI'
   },
 }
