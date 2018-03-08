@@ -75,12 +75,30 @@ export default class Binary {
     return value
   }
 
+  /**
+   * Set the byte of the given binary number, 0-based from the RIGHT.
+   * @example  buf = 00000000 00000000
+   *           setByte(0, 42) =>
+   *                 00000000 00101010
+   * @param index The 0-based byte position from the RIGHT
+   * @param value The value of the byte
+   */
   public setByte(index: number, value: number) {
-    this.buf[index] = value
+    if (index >= this.buf.length) {
+      throw new Error(`Binary: Byte index out of range.`)
+    }
+
+    this.buf[this.buf.length - 1 - index] = value
   }
 
+  /**
+   * Get the byte of the given 0-based index from the RIGHT.
+   * @example  buf = 00101010 00000000
+   *           getByte(1) => 42
+   * @param index The 0-based index from the RIGHT
+   */
   public getByte(index: number): number {
-    return this.buf[index]
+    return this.buf[this.buf.length - 1 - index]
   }
 
   public getRange(start: number, end: number): number {
