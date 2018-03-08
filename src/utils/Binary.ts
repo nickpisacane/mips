@@ -148,6 +148,14 @@ export default class Binary {
     return this.buf[this.buf.length - 1 - index]
   }
 
+  /**
+   * Get the cumulative value of the bit-range (0-based, from the RIGHT).
+   * @example  buf = 00010001 00000001
+   *                        ^        ^
+   *           getRange(0, 8) => 257
+   * @param start The 0-based position from the RIGHT
+   * @param end   The 0-based position from the RIGHT
+   */
   public getRange(start: number, end: number): number {
     this.checkBitRange(start, end)
 
@@ -162,22 +170,31 @@ export default class Binary {
     return ret
   }
 
+  /**
+   * Get the value of the total binary number.
+   */
   public getValue(): number {
     return this.getRange(0, this.size - 1)
   }
 
+  /**
+   * Override `valueOf`
+   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf
+   */
   public valueOf(): number {
     return this.getValue()
   }
 
-  public toString(): string {
-    let ret = ''
-
-    for (let i = this.size - 1; i >= 0; i--) {
-      ret += this.getBit(i)
+  /**
+   * Override `toString`. Returns a string representation of the binary number
+   * in the given radix.
+   */
+  public toString(radix: number = 2): string {
+    if (radix < 2 || radix > 36) {
+      throw new Error(`Binary: Radix must be in range [2, 36]`)
     }
 
-    return ret
+    return this.getValue().toString(radix)
   }
 
   public toUint8Array() {
