@@ -43,7 +43,7 @@ export default class Binary {
   private checkBitPos(pos: number) {
     if (pos < 0 || pos >= this.size) {
       throw new Error(
-        `Binary: Bit position "${pos}" is out of range (0, ${this.size - 1})`
+        `Binary: Bit position "${pos}" is out of range [0, ${this.size - 1}]`
       )
     }
   }
@@ -55,7 +55,7 @@ export default class Binary {
   private checkByteIndex(index: number) {
     if (index < 0 || index >= this.buf.length) {
       throw new Error(
-        `Binary: Byte index "${index}" is out of range (0, ${this.buf.length - 1})`
+        `Binary: Byte index "${index}" is out of range [0, ${this.buf.length - 1}]`
       )
     }
   }
@@ -68,13 +68,13 @@ export default class Binary {
   private checkBitRange(start: number, end: number) {
     if (start >= end) {
       throw new Error(
-        `Binary: Invalid bit-range (${start}, ${end}): start must be below end`
+        `Binary: Invalid bit-range [${start}, ${end}]: start must be below end`
       )
     }
 
     if (start < 0 || start >= this.size || end < 0 || end >= this.size) {
       throw new Error(
-        `Binary: Bit range "(${start}, ${end})" must be within (0, ${this.size - 1})`
+        `Binary: Bit range "[${start}, ${end}]" must be within [0, ${this.size - 1}]`
       )
     }
   }
