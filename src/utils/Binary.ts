@@ -255,4 +255,24 @@ export default class Binary {
 
     return binary
   }
+
+  /**
+   * Helper to return a Binary instance from a given POSITIVE number.
+   * @param num Positive number
+   */
+  static fromNumber(num: number): Binary {
+    num = Math.abs(Math.floor(num))
+    const size = Math.floor(Math.log(num) / Math.log(2)) + 1
+    const binary = new Binary(size)
+
+    let i = 0
+    while (num) {
+      const byte = num % 256
+      binary.setByte(i, byte)
+      num = Math.floor(num / 256)
+      i++
+    }
+
+    return binary
+  }
 }
