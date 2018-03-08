@@ -197,8 +197,11 @@ export default class Binary {
     return this.getValue().toString(radix)
   }
 
-  public toUint8Array() {
-    const clone = new Uint8Array(this.size / 8)
+  /**
+   * Get Uint8Array representation of binary number.
+   */
+  public toUint8Array(): Uint8Array {
+    const clone = new Uint8Array(Math.ceil(this.size / 8))
 
     for (let i = 0; i < this.buf.length; i++) {
       clone[i] = this.buf[i]
@@ -207,45 +210,58 @@ export default class Binary {
     return clone
   }
 
-  public toUint32Array() {
-    const size32 = this.size / 32
-    const clone = new Uint32Array(size32)
+  /**
+   * get Uint32Array representation of binary number.
+   */
+  public toUint32Array(): Uint32Array {
+    const clone = new Uint32Array(Math.ceil(this.size / 32))
 
-    // TODO: Fix this
-    for (let i = 0; i < size32; i++) {
-      clone[i] =
-        this.buf[i + 0] |
-        this.buf[i + 1] |
-        this.buf[i + 2] |
-        this.buf[i + 3]
+    for (let i = 0, j = 0; i < this.buf.length; i += 4, j++) {
+      clone[j] =
+          this.buf[i + 0]              |
+        ((this.buf[i + 1] || 0) << 8)  |
+        ((this.buf[i + 2] || 0) << 16) |
+        ((this.buf[i + 3] || 0) << 24)
     }
 
     return clone
   }
 
+  /**
+   * Get a Binary instance from a Uint8Array.
+   * @param arr The Uint8Array
+   */
   static fromUint8Array(arr: Uint8Array): Binary {
     const binary = new Binary(arr.length * 8)
 
     for (let i = 0; i < arr.length; i++) {
-      binary.setByte(i, arr[i])
+      binary.buf[i] = arr[i]
     }
 
     return binary
   }
 
+  /**
+   * Get a Binary instance from a Uint32Array
+   * @param arr The Uint32Array
+   */
   static fromUint32Array(arr: Uint32Array): Binary {
     const binary = new Binary(arr.length * 32)
 
     for (let i = 0; i < arr.length; i++) {
-      binary.setByte(i + 0, (arr[i] & 0xff000000) >>> 24)
-      binary.setByte(i + 1, (arr[i] & 0x00ff0000) >>> 16)
-      binary.setByte(i + 2, (arr[i] & 0x0000ff00) >>> 8)
-      binary.setByte(i + 3, (arr[i] & 0x000000ff))
+      binary.buf[i * 4 + 3] = (arr[i] & 0x000000ff) >>> 0
+      binary.buf[i * 4 + 2] = (arr[i] & 0x0000ff00) >>> 8
+      binary.buf[i * 4 + 1] = (arr[i] & 0x00ff0000) >>> 16
+      binary.buf[i * 4 + 0] = (arr[i] & 0xff000000) >>> 24
     }
 
     return binary
   }
 
+  /**
+   * Helper to return a Binary instance from a given array of bits, RIGHT based.
+   * @param arr The array of bits.
+   */
   static fromArray(arr: number[]): Binary {
     const binary = new Binary(arr.length)
 
