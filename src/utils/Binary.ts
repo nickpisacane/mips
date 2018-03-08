@@ -11,14 +11,39 @@ export default class Binary {
     this.buf = new Uint8Array(this.size / 8)
   }
 
+  /**
+   * Get the BYTE-based index for internal Uint8Array of a given 0-based position
+   * from the RIGHT of the binary number.
+   * @example  buf = 00000000 11111111
+   *                        ^
+   *           getIndexForPos(8) => 1
+   * @param pos The 0-based position from the right
+   */
   private getIndexForPos(pos: number): number {
     return this.buf.length - 1 - Math.floor(Math.abs(pos | 0) / 8)
   }
 
+
+  /**
+   * Get the BIT-based position for a given 0-based position from the RIGHT of
+   * the binary number
+   * @example buf = 00000000 11111111
+   *                       ^
+   *          getBitPosForPos(8) => 0
+   * @param pos The 0-based position from the RIGHT
+   */
   private getBitPosForPos(pos: number): number {
     return Math.abs(pos | 0) % 8
   }
 
+  /**
+   * Set the bit (0-based) from the RIGHT of the binary number.
+   * @example  buf = 00000000
+   *           setBit(0, 1) => 00000001
+   *           setBit(3, 1) => 00001001
+   * @param pos The 0-based position from the RIGHT
+   * @param value The binary value to set the bit at the position
+   */
   public setBit(pos: number, value: number) {
     // only concerned with first bit of value
     const bitValue = value & 1
@@ -35,6 +60,13 @@ export default class Binary {
     }
   }
 
+  /**
+   * Get the bit for the given 0-based position from the RIGHT
+   * @example  buf = 00001000 11001010
+   *                     ^
+   *           getBit(11) => 1
+   * @param pos The 0-based position from the RIGHT
+   */
   public getBit(pos: number): number {
     const index = this.getIndexForPos(pos)
     const bitPos = this.getBitPosForPos(pos)
