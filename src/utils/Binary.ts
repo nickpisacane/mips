@@ -37,6 +37,49 @@ export default class Binary {
   }
 
   /**
+   * Validate a bit-position. Throws an error if invalid.
+   * @param pos The position to check.
+   */
+  private checkBitPos(pos: number) {
+    if (pos < 0 || pos >= this.size) {
+      throw new Error(
+        `Binary: Bit position "${pos}" is out of range (0, ${this.size - 1})`
+      )
+    }
+  }
+
+  /**
+   * Validate the byte-index. Throws an error if invalid.
+   * @param index The index to check.
+   */
+  private checkByteIndex(index: number) {
+    if (index < 0 || index >= this.buf.length) {
+      throw new Error(
+        `Binary: Byte index "${index}" is out of range (0, ${this.buf.length - 1})`
+      )
+    }
+  }
+
+  /**
+   * Validate the give bit-range. Throws an error if invalid.
+   * @param start The start of the range (inclusive)
+   * @param end   The end of the range (inclusive)
+   */
+  private checkBitRange(start: number, end: number) {
+    if (start >= end) {
+      throw new Error(
+        `Binary: Invalid bit-range (${start}, ${end}): start must be below end`
+      )
+    }
+
+    if (start < 0 || start >= this.size || end < 0 || end >= this.size) {
+      throw new Error(
+        `Binary: Bit range "(${start}, ${end})" must be within (0, ${this.size - 1})`
+      )
+    }
+  }
+
+  /**
    * Set the bit (0-based) from the RIGHT of the binary number.
    * @example  buf = 00000000
    *           setBit(0, 1) => 00000001
@@ -45,6 +88,8 @@ export default class Binary {
    * @param value The binary value to set the bit at the position
    */
   public setBit(pos: number, value: number) {
+    this.checkBitPos(pos)
+
     // only concerned with first bit of value
     const bitValue = value & 1
     const index = this.getIndexForPos(pos)
@@ -68,6 +113,8 @@ export default class Binary {
    * @param pos The 0-based position from the RIGHT
    */
   public getBit(pos: number): number {
+    this.checkBitPos(pos)
+
     const index = this.getIndexForPos(pos)
     const bitPos = this.getBitPosForPos(pos)
     const value = (this.buf[index] & (1 << bitPos)) >>> bitPos
@@ -84,9 +131,7 @@ export default class Binary {
    * @param value The value of the byte
    */
   public setByte(index: number, value: number) {
-    if (index >= this.buf.length) {
-      throw new Error(`Binary: Byte index out of range.`)
-    }
+    this.checkByteIndex(index)
 
     this.buf[this.buf.length - 1 - index] = value
   }
@@ -98,10 +143,14 @@ export default class Binary {
    * @param index The 0-based index from the RIGHT
    */
   public getByte(index: number): number {
+    this.checkByteIndex(index)
+
     return this.buf[this.buf.length - 1 - index]
   }
 
   public getRange(start: number, end: number): number {
+    this.checkBitRange(start, end)
+
     start = Math.abs(start | 0)
     end = Math.abs(end | 0)
     let ret = 0
