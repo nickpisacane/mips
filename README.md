@@ -1,12 +1,13 @@
 # mips
 
-### [Online Demo](http://mips.run)
+### [Online Demo](http://nickpisacane.github.io/mips)
 
-Mips assembler/interpreter in JavaScript (via TypeScript). MIPS is currently a 
+Mips assembler/interpreter in JavaScript (via TypeScript). MIPS is currently a
 work-in-progress, but it has been tested to run most non-floating-point instruction
 mips code. See the [Road Map](#road-map) for near-future features.
 
 # Installation
+
 ```sh
 npm install mips
 # or
@@ -14,6 +15,7 @@ yarn install mips
 ```
 
 # Road Map
+
 - [x] Implement fundamental R, I, and J type instructions
 - [x] Create basic browser demo app
 - [x] Create event (publish-subscribe) API for Memory/Registers
